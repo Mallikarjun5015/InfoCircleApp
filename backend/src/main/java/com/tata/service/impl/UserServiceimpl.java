@@ -70,4 +70,18 @@ public class UserServiceimpl implements UserService {
 
 		return this.modelMapper.map(newUser, UserDto.class);
 	}
+
+	@Override
+	public List<UserDto> getAllUser() {
+		return this.userRepository.findAll().stream().map(user -> this.modelMapper.map(user, UserDto.class))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public UserDto getUserById(Integer userId) {
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+		return this.modelMapper.map(user, UserDto.class);
+	}
 }
