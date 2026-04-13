@@ -64,4 +64,11 @@ public class CommentServiceImpl implements CommentService {
         Comment updatedComment = commentRepository.save(comment);
         return modelMapper.map(updatedComment, CommentDto.class);
     }
+
+     @Override
+	public void deleteComment(Integer commentId) {
+      
+    	Comment comment = commentRepository.findById(commentId).orElseThrow(() ->new ResourceNotFoundException("Comment", "commentId", commentId));
+        commentRepository.delete(comment);
+    }
 }
