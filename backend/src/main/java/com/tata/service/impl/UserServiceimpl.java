@@ -84,4 +84,25 @@ public class UserServiceimpl implements UserService {
 
 		return this.modelMapper.map(user, UserDto.class);
 	}
+
+	@Override
+	public UserDto updateUser(UserDto userDto, Integer userId) {
+
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+		user.setUserName(userDto.getUserName());
+		user.setEmail(userDto.getEmail());
+		user.setMobileNumber(userDto.getMobileNumber());
+		user.setBio(userDto.getBio());
+		user.setAbout(userDto.getAbout());
+		user.setProfileImage(userDto.getProfileImage());
+		user.setAddress(userDto.getAddress());
+		user.setCity(userDto.getCity());
+		user.setPincode(userDto.getPincode());
+
+		User updatedUser = this.userRepository.save(user);
+
+		return this.modelMapper.map(updatedUser, UserDto.class);
+	}
 }
