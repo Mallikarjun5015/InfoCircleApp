@@ -49,4 +49,11 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public CommentDto getCommentById(Integer commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->new ResourceNotFoundException("Comment", "commentId", commentId));
+        return modelMapper.map(comment, CommentDto.class);
+    }
+
+
 }
