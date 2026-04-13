@@ -40,4 +40,13 @@ public class CommentServiceImpl implements CommentService {
         
         return modelMapper.map(savedComment, CommentDto.class);
     }
+
+    @Override
+    public List<CommentDto> getAllComments() {
+        List<Comment> comments = commentRepository.findAll();
+        return comments.stream()
+                .map(comment -> modelMapper.map(comment, CommentDto.class))
+                .collect(Collectors.toList());
+    }
+
 }
