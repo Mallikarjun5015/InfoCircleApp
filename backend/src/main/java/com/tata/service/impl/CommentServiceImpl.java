@@ -55,5 +55,13 @@ public class CommentServiceImpl implements CommentService {
         return modelMapper.map(comment, CommentDto.class);
     }
 
+    @Override
+    public CommentDto updateComment(CommentDto commentDto, Integer commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->new ResourceNotFoundException("Comment", "commentId", commentId));
 
+        comment.setContent(commentDto.getContent());
+
+        Comment updatedComment = commentRepository.save(comment);
+        return modelMapper.map(updatedComment, CommentDto.class);
+    }
 }
