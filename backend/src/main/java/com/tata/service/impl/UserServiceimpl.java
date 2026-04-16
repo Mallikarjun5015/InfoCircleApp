@@ -105,4 +105,13 @@ public class UserServiceimpl implements UserService {
 
 		return this.modelMapper.map(updatedUser, UserDto.class);
 	}
+
+	@Override
+	public void deleteUser(Integer userId) {
+
+		User user = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+		userRepository.delete(user);
+	}
 }
