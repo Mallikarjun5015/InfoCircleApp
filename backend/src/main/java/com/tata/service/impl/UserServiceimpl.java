@@ -40,7 +40,7 @@ public class UserServiceimpl implements UserService {
 	@Autowired
 	private EmailService emailService;
 
-		// REGISTER USER
+	// REGISTER USER
 	@Override
 	public UserDto registerUser(UserDto userDto) {
 
@@ -114,4 +114,63 @@ public class UserServiceimpl implements UserService {
 
 		userRepository.delete(user);
 	}
+
+	@Override
+	public UserDto saveUser(UserDto userDto) {
+		User user = this.modelMapper.map(userDto, User.class);
+		User savedUser = this.userRepository.save(user);
+		return this.modelMapper.map(savedUser, UserDto.class);
+	}
+
+	@Override
+	public void generateResetToken(String email) {
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+		String token = UUID.randomUUID().toString();
+
+		user.setResetToken(token);
+		user.setTokenExpiry(LocalDateTime.now().plusMinutes(15));
+
+		userRepository.save(user);
+
+		String resetLink = "http://localhost:5000/reset-password?token=" + token;
+
+		// Use centralized email message
+		emailService.sendEmail(user.getEmail(), "Password Reset Request",
+				EmailMessages.getResetPasswordMessage(resetLink));
+	}
+
+	@Override
+	public void resetPassword(String token, String newPassword) {
+
+		User user = userRepository.findByResetToken(token).orElseThrow(() -> new RuntimeException("Invalid token"));
+
+		if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("Token expired");
+		}
+
+		user.setPassword(passwordEncoder.encode(newPassword));
+		user.setResetToken(null);
+		user.setTokenExpiry(null);
+
+		userRepository.save(user);
+	}
+
+	@Override
+	public void changePassword(String email, String oldPassword, String newPassword) {
+
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+		if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+			throw new RuntimeException("Old password is incorrect");
+		}
+
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+	}
+
+
 }
