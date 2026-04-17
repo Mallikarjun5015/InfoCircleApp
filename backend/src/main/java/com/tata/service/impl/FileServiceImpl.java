@@ -36,6 +36,14 @@ public class FileServiceImpl implements com.tata.service.FileService{
 		return fileName1;
 	}
 
-	
+	@Override
+	public InputStream getResource(String path, String fileName) throws FileNotFoundException {
+		
+		String fullPath = path + File.separator +fileName;
+		
+		InputStream is = new FileInputStream(fullPath);
+		
+		return is;
+	}
 
 }
